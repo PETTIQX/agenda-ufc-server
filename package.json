@@ -1,0 +1,27 @@
+{
+  "name": "agenda-ufc-server",
+  "version": "1.0.0",
+  "description": "WebService Agenda Universitária UFC",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PETTIQX/agenda-ufc-server.git"
+  },
+  "author": "Alexsandro Oliveira",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PETTIQX/agenda-ufc-server/issues"
+  },
+  "homepage": "https://github.com/PETTIQX/agenda-ufc-server#readme",
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4",
+    "lodash": "^4.13.1",
+    "method-override": "^2.3.6",
+    "mongoose": "^4.4.19",
+    "morgan": "^1.7.0"
+  }
+}

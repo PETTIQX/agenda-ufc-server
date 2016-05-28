@@ -1,0 +1,38 @@
+#Incluir administrador - nós do PET
+
+
+Usuario: {
+  _id: ObjectId,
+  nome: String,
+  login:String, #Matricula ou Siape
+  email: String,
+  telefone: String,
+  senha: String,
+  vinculacao: Int # 0 - aluno, 1 - professor - 2 - servidores em geral,
+  editor: Boolean
+}
+
+Local:{
+  _id: ObjectId,
+  nome: String,
+  descricao: String
+}
+
+Atividade:{
+  _id: ObjectId,
+  nome: String,
+  descricao: String,
+  categoria: String,
+  horarios: [
+    {
+          data: Date,
+          hora: Time,
+          frequencia: Int #-1 uma vez, 0 Diariamente, 1 Semanalmente,2 quinzenalmente, 3 Mensalmente
+    }
+  ],
+  local: ObjectId,
+  tags: [String],
+  site: String,
+  imagens: [String],
+  usuario: ObjectId
+}
