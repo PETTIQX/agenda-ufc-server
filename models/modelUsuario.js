@@ -16,7 +16,7 @@ var schema = new Schema({
   telefone: {type:String, required:true},
   senha: {type:String, required:true, select:false},
   vinculacao: {type:Number, required:true},
-  editor: {type:Number, default:false}
+  editor: {type:Boolean, default:false}
 }, {collection: constants.COLLECTION_NAME})
 
 var fullUser = {nome:1, login:1, email:1, telefone:1, senha:1, vinculacao:1, editor:1};
