@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/PETTIQX/agenda-ufc-server#readme",
   "dependencies": {
+    "bcrypt": "^0.8.7",
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
+    "jwt-simple": "^0.5.0",
     "lodash": "^4.13.1",
     "method-override": "^2.3.6",
     "mongoose": "^4.4.19",
