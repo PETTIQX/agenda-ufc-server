@@ -61,7 +61,7 @@ router.put('/', function(req,res, next){
 
 });
 
-router.delete('/', function(req,res, next){
+router.delete('/', function(req, res, next){
 
     if(!req.auth.editor){
       return res.sendStatus(401);

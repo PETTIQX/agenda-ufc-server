@@ -89,4 +89,41 @@ router.delete('/', function(req,res, next){
 
 });
 
-module.exports = router
+router.get('/', function(req,res,next){
+  if(!req.auth.editor){
+    return res.sendStatus(401);
+  }
+
+  var query = {usuario:req.auth._id};
+  Atividade.find(query, function(err, atividades){
+      if(err){
+        return next(err);
+      }
+
+      return res.json(atividades);
+  });
+
+});
+
+router.post('/busca', function(req,res,next){
+  if(!req.auth.editor){
+    return res.sendStatus(401);
+  }
+
+  var skip = parseInt(req.body.skip || 0)
+  var limit = parseInt(req.body.limit || 0)
+  var sort = req.body.sort || {data:-1}
+
+  req.body.query.usuario = req.auth._id;
+
+  Atividade.search(req.body.query, sort, skip, limit, function(err, atividades){
+    if(err){
+      return next(err);
+    }
+
+    return res.json(atividades);
+  });
+
+});
+
+module.exports = router;

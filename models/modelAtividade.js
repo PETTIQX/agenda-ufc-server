@@ -26,6 +26,46 @@ var schema = new Schema({
   usuario: {type:ObjectId, required:true}
 }, {collection: constants.COLLECTION_NAME})
 
+schema.statics.search = function(query, sort, skip, limit, cb){
+
+  if(query._id){
+    query._id = mongoose.Types.ObjectId(query._id);
+  }
+  if(query.usuario){
+    query.usuario = mongoose.Types.ObjectId(query.usuario);
+  }
+  if(query.local){
+    query.local = mongoose.Types.ObjectId(query.local);
+  }
+
+  var aggregation = [
+      {$match: query},
+      {$lookup:
+         {
+           from: "locais",
+           localField: "local",
+           foreignField: "_id",
+           as: "local"
+         }
+      },
+      {$unwind: "$local"}
+    ];
+
+  //mongoose.Types.ObjectId
+  if(sort){
+    aggregation.push({$sort:sort});
+  }
+
+  if(skip){
+    aggregation.push({$skip:skip});
+  }
+
+  if(limit){
+    aggregation.push({$limit:limit});
+  }
+
+  this.aggregate(aggregation).exec(cb);
+}
 
 var Atividade  = mongoose.model(constants.MODEL_NAME, schema)
 Atividade.constants = constants
