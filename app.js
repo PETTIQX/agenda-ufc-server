@@ -1,42 +1,53 @@
-var express = require('express')
-var logger = require('morgan')
-var router = require('./routes')
-var bodyParser = require('body-parser')
-var methodOverride = require('method-override')
+var express = require('express');
+var logger = require('morgan');
+var router = require('./routes');
+var bodyParser = require('body-parser');
+var serveStatic = require('serve-static');
+var methodOverride = require('method-override');
 
-var app = express()
+var app = express();
 
 cors = require('./cors');
 app.use(cors());
 
 // Configuration
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 // override with POST having ?_method=DELETE
-app.use(methodOverride('_method'))
+app.use(methodOverride('_method'));
 
-app.use('/api', router)
+var options = {
+    index: false,
+    maxAge: '1d',
+    redirect: false,
+    setHeaders: function (res, path, stat) {
+      res.set('x-timestamp', Date.now());
+    }
+};
+
+app.use('/public/image',serveStatic(__dirname + '/uploads/image', options));
+app.use('/api', router);
 
 if('development' == app.get('env')){
   //development only
   //var errorHandler = require('errorhandler');
   //app.use(errorHandler({ dumpExceptions: true, showStack: true }))
-  app.use(logger('dev'))
+  app.use(logger('dev'));
 }
 
 if('production' ==  app.get('env')){
   //app.use()
-  app.use(logger('common'))
+  app.use(logger('common'));
   //todo usar middleware para tratar erros
 }
 
 app.use(function(err, req, res, next) {
 
-  console.error(err.stack)
+  console.error(err.stack);
 
-  res.status(500)
+  res.status(500);
 
-  return res.json({code:500,err:err})
+  return res.json({code:500,err:err});
 
 });
 

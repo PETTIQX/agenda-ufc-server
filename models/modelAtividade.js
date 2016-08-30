@@ -8,14 +8,21 @@ var constants = {
   COLLECTION_NAME: 'atividades'
 }
 
-// #-1 uma vez, 0 Diariamente, 1 Semanalmente,2 quinzenalmente, 3 Mensalmente
+// #-0 uma vez, 1 Diariamente, 2 Semanalmente, 3 Mensalmente
+// campo de exclusão de fim de semana
+// date = dia, mes, ano
 var schema = new Schema({
   nome: {type:String, required:true},
   descricao: {type:String, required:true},
   categoria: {type:String, required:true},
   horarios: [
     {
-          data: {type:Date, required:true},
+          hora: {type: Date, required: true},
+          dia: {type:Number, required:true},
+          mes: {type: Number, required:true},
+          ano: {type:Number, default: 0},
+          excluirFds: {type: Boolean, default: true},
+          diaDaSemana: {type: Number, required: true},
           frequencia: {type: Number, required:true}
     }
   ],
@@ -25,6 +32,22 @@ var schema = new Schema({
   imagens: [String],
   usuario: {type:ObjectId, required:true}
 }, {collection: constants.COLLECTION_NAME})
+
+schema.statics.addImage = function(idAtividade,image, cb){
+
+  var query = {_id: idAtividade}
+
+  var update = {
+    $pushAll: {imagens:image}
+  }
+
+  var options = {
+    "multi" : false,  // update only one document
+    "upsert" : false  // insert a new document, if no existing document match the query
+  }
+
+  this.update(query, update, options, cb);
+}
 
 schema.statics.search = function(query, sort, skip, limit, cb){
 

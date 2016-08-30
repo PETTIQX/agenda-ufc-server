@@ -2,6 +2,11 @@ var express = require('express')
 var router = express.Router()
 var Atividade = require('../../models/modelAtividade');
 var _ = require('lodash');
+var fs = require('fs');
+var multiparty = require('connect-multiparty');
+var path = require('path');
+var util = require('../../util');
+
 
 router.post('/', function(req,res, next){
 
@@ -125,5 +130,62 @@ router.post('/busca', function(req,res,next){
   });
 
 });
+
+router.route('/image')
+    .post(multiparty(), function(req,res,next){
+
+        if(!req.body.idAtividade){
+            return res.sendStatus(400);
+        }
+
+        Atividade.findById(req.body.idAtividade, function(err, atividade){
+
+            if(!atividade){
+                console.log("Atividade nulo")
+                return res.sendStatus(400);
+            }
+
+            //Verificar Permissão
+            if(req.auth._id != atividade.usuario){
+              return res.sendStatus(401);
+            }
+
+            res.setHeader("Access-Control-Allow-Origin", "*");
+
+            if(!req.files) return res.sendStatus(400);
+            if(!req.files.file) return res.sendStatus(400);
+
+            var arquivo = req.files.file;
+            var temporario = req.files.file.path;
+
+            //var novo = __dirname + "/uploads/" + util.generateUUID() + ".png"
+            console.log(temporario.indexOf(".jpg") > -1);
+            var ext = (temporario.indexOf(".jpg") > -1) ? ".jpg" : ".png";
+
+            var imagePathName = util.generateImageName(ext);
+
+            var novo = util.generateFullImagePath(imagePathName);
+
+            fs.rename(temporario, novo, function(err){
+                if(err) {
+                    //return res.sendStatus(500).json({error: err})
+                    return next(err);
+                }
+
+                Atividade.addImage(req.body.idAtividade, [imagePathName], function(err, atividade){
+
+                    if(err){
+                        //return res.sendStatus(500).json({error: err})
+                        return next(err);
+                    }
+
+                    return res.sendStatus(200);
+                })
+
+            })
+
+        })
+
+    })
 
 module.exports = router;
