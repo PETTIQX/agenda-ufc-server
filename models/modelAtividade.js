@@ -49,6 +49,25 @@ schema.statics.addImage = function(idAtividade,image, cb){
   this.update(query, update, options, cb);
 }
 
+schema.statics.removeImage = function(idAtividade, idUsuario, imagem, callback){
+
+  this.update(
+    // query
+    {
+        _id: idAtividade,
+        usuario: idUsuario
+    },
+    // update
+    { $pull: { imagens: imagem} },
+    // options
+    {
+        "multi" : false,  // update only one document
+        "upsert" : false  // insert a new document, if no existing document match the query
+    }
+  ).exec(callback);
+
+}
+
 schema.statics.search = function(query, sort, skip, limit, cb){
 
   if(query._id){

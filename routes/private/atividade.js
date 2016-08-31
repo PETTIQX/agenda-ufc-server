@@ -131,8 +131,34 @@ router.post('/busca', function(req,res,next){
 
 });
 
+router.delete('/image', function(req,res,next){
+
+  if(!req.auth.editor){
+    return res.sendStatus(401);
+  }
+
+  if(!req.body.idAtividade || !req.body.imagem){
+      return res.sendStatus(400);
+  }
+
+  var idUsuario = req.auth._id;
+
+  Atividade.removeImage(req.body.idAtividade, idUsuario, req.body.imagem, function(err, result){
+    if(err){
+      return next(err);
+    }
+
+    return res.json(result);
+  });
+
+});
+
 router.route('/image')
     .post(multiparty(), function(req,res,next){
+
+        if(!req.auth.editor){
+          return res.sendStatus(401);
+        }
 
         if(!req.body.idAtividade){
             return res.sendStatus(400);
