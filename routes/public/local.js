@@ -4,9 +4,9 @@ var Local = require('../../models/modelLocal');
 
 router.post('/busca', function(req,res,next){
 
-  var skip = parseInt(req.body.skip || 0)
-  var limit = parseInt(req.body.limit || 0)
-  var sort = req.body.sort || {data:-1}
+  var skip = parseInt(req.body.skip || 0);
+  var limit = parseInt(req.body.limit || 0);
+  var sort = req.body.sort || {nome:-1};
 
   Local.find(req.body.query).sort(sort).skip(skip).limit(limit).exec(function(err, locais){
     if(err){

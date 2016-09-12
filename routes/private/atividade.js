@@ -117,7 +117,7 @@ router.post('/busca', function(req,res,next){
 
   var skip = parseInt(req.body.skip || 0)
   var limit = parseInt(req.body.limit || 0)
-  var sort = req.body.sort || {data:-1}
+  var sort = req.body.sort || {nome:-1}
 
   req.body.query.usuario = req.auth._id;
 
@@ -155,7 +155,8 @@ router.delete('/image', function(req,res,next){
 
 router.route('/image')
     .post(multiparty(), function(req,res,next){
-
+        //TODO atributo "principal" para foto de capa
+        //TODO atributo "imagemPrincipal" para a imagem da atividade
         if(!req.auth.editor){
           return res.sendStatus(401);
         }

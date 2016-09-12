@@ -10,6 +10,7 @@ var constants = {
 
 // #-0 uma vez, 1 Diariamente, 2 Semanalmente, 3 Mensalmente
 // campo de exclusão de fim de semana
+// dia da semana 1- segunda, 7 - domingo
 // date = dia, mes, ano
 var schema = new Schema({
   nome: {type:String, required:true},
@@ -30,7 +31,8 @@ var schema = new Schema({
   tags: [String],
   site: {type:String},
   imagens: [String],
-  usuario: {type:ObjectId, required:true}
+  usuario: {type:ObjectId, required:true},
+  imagemPrincipal: {type:String}
 }, {collection: constants.COLLECTION_NAME})
 
 schema.statics.addImage = function(idAtividade,image, cb){
@@ -108,6 +110,84 @@ schema.statics.search = function(query, sort, skip, limit, cb){
 
   this.aggregate(aggregation).exec(cb);
 }
+
+schema.statics.periodSearch = function(queryData, sort, skip, limit, cb){
+
+  // tipo: 1: hoje, 2: semana, 3: mês
+  // dia:
+  // mes: 
+  // ano: 
+  // diaDaSemana: 
+
+  //TODO colocar and e or
+
+  //todo verificar se diadasemana é fds, caso não colocar queryData.fimDeSemana para false
+  var query = {};
+  if(queryData.tipo == 1){
+    query = {
+      horarios: {
+          $elemMatch:{
+            $or: [
+                {
+                  frequencia:0, 
+                  dia: queryData.dia,
+                  mes: queryData.mes,
+                  ano: queryData.ano
+                },
+                {
+                  frequencia:1,
+                  $or:[
+                    {excluirFds :false},
+                    {excluirFds :queryData.fimDeSemana} 
+                  ] 
+                },
+                {
+                  frequencia:2,
+                  diaDaSemana: queryData.diaDaSemana
+                },
+                {
+                  frequencia:3,
+                  dia: queryData.dia
+                }
+              ]
+          }
+      }
+    };
+  }else if(queryData.tipo == 2){
+
+  }else if(queryData.tipo == 3){
+
+  }
+
+  var aggregation = [
+      {$match: query},
+      {$lookup:
+         {
+           from: "locais",
+           localField: "local",
+           foreignField: "_id",
+           as: "local"
+         }
+      },
+      {$unwind: "$local"}
+    ];
+
+  //mongoose.Types.ObjectId
+  if(sort){
+    aggregation.push({$sort:sort});
+  }
+
+  if(skip){
+    aggregation.push({$skip:skip});
+  }
+
+  if(limit){
+    aggregation.push({$limit:limit});
+  }
+
+  this.aggregate(aggregation).exec(cb);
+
+} 
 
 var Atividade  = mongoose.model(constants.MODEL_NAME, schema)
 Atividade.constants = constants
