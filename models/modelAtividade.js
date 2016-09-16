@@ -10,7 +10,7 @@ var constants = {
 
 // #-0 uma vez, 1 Diariamente, 2 Semanalmente, 3 Mensalmente
 // campo de exclusão de fim de semana
-// dia da semana 1- segunda, 7 - domingo
+// dia da semana 0 - domingo , 6 - sábado
 // date = dia, mes, ano
 var schema = new Schema({
   nome: {type:String, required:true},
