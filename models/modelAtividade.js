@@ -72,14 +72,16 @@ schema.statics.removeImage = function(idAtividade, idUsuario, imagem, callback){
 
 schema.statics.search = function(query, sort, skip, limit, cb){
 
-  if(query._id){
-    query._id = mongoose.Types.ObjectId(query._id);
-  }
-  if(query.usuario){
-    query.usuario = mongoose.Types.ObjectId(query.usuario);
-  }
-  if(query.local){
-    query.local = mongoose.Types.ObjectId(query.local);
+  if(query){
+    if(query._id){
+      query._id = mongoose.Types.ObjectId(query._id);
+    }
+    if(query.usuario){
+      query.usuario = mongoose.Types.ObjectId(query.usuario);
+    }
+    if(query.local){
+      query.local = mongoose.Types.ObjectId(query.local);
+    }
   }
 
   var aggregation = [
@@ -115,9 +117,9 @@ schema.statics.periodSearch = function(queryData, sort, skip, limit, cb){
 
   // tipo: 1: hoje, 2: semana, 3: mês
   // dia:
-  // mes: 
-  // ano: 
-  // diaDaSemana: 
+  // mes:
+  // ano:
+  // diaDaSemana:
 
   //TODO colocar and e or
 
@@ -129,7 +131,7 @@ schema.statics.periodSearch = function(queryData, sort, skip, limit, cb){
           $elemMatch:{
             $or: [
                 {
-                  frequencia:0, 
+                  frequencia:0,
                   dia: queryData.dia,
                   mes: queryData.mes,
                   ano: queryData.ano
@@ -137,9 +139,9 @@ schema.statics.periodSearch = function(queryData, sort, skip, limit, cb){
                 {
                   frequencia:1,
                   $or:[
-                    {excluirFds :false},
-                    {excluirFds :queryData.fimDeSemana} 
-                  ] 
+                    {excluirFds :false}, //caso não exclua o fim de semana, o documento entra
+                    {excluirFds : !queryData.fimDeSemana} //se for fim de semana, então só entra atividade com
+                  ]
                 },
                 {
                   frequencia:2,
@@ -153,10 +155,39 @@ schema.statics.periodSearch = function(queryData, sort, skip, limit, cb){
           }
       }
     };
-  }else if(queryData.tipo == 2){
-
-  }else if(queryData.tipo == 3){
-
+  }else if(queryData.tipo == 2 || queryData.tipo == 3){
+    query = {
+      horarios: {
+          $elemMatch:{
+            $or: [
+                {
+                  frequencia:0,
+                  dia: {$gte : queryData.dia, $lte : queryData.diaFinal},
+                  mes: {$gte : queryData.mes, $lte : queryData.mesFinal},
+                  ano: {$gte : queryData.ano, $lte : queryData.anoFinal}
+                },
+                {
+                  frequencia:1,
+                  $or:[
+                    {excluirFds :false}, //caso não exclua o fim de semana, o documento entra
+                    {excluirFds : !queryData.fimDeSemana} //se for fim de semana, então só entra atividade com
+                  ]
+                },
+                {
+                  frequencia:2,
+                  $or:[
+                    {diaDaSemana: {$gte : queryData.diaDaSemanaRange1, $lte : queryData.diaDaSemanaRange1Final}},
+                    {diaDaSemana: {$gte : queryData.diaDaSemanaRange2, $lte : queryData.diaDaSemanaRange2Final}}
+                  ]
+                },
+                {
+                  frequencia:3,
+                  dia: {$gte : queryData.dia, $lte : queryData.diaFinal}
+                }
+              ]
+          }
+      }
+    };
   }
 
   var aggregation = [
@@ -187,7 +218,7 @@ schema.statics.periodSearch = function(queryData, sort, skip, limit, cb){
 
   this.aggregate(aggregation).exec(cb);
 
-} 
+}
 
 var Atividade  = mongoose.model(constants.MODEL_NAME, schema)
 Atividade.constants = constants
