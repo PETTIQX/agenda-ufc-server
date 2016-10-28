@@ -1,7 +1,7 @@
 var mongoose = require('../db.js');
 var bcrypt = require('bcrypt');
 var Schema = mongoose.Schema;
-ObjectId = Schema.ObjectId;
+var ObjectId = Schema.ObjectId;
 
 var constants = {
   MODEL_NAME: 'Atividade',
@@ -120,8 +120,6 @@ schema.statics.periodSearch = function(queryData, sort, skip, limit, cb){
   // mes:
   // ano:
   // diaDaSemana:
-
-  //TODO colocar and e or
 
   //todo verificar se diadasemana é fds, caso não colocar queryData.fimDeSemana para false
   var query = {};
